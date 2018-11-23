@@ -1,0 +1,19 @@
+1、缓存是由HTTP消息头中的“Cache-control”来控制的，常见的取值有private、no-cache、max-age、must-revalidate等，默认为private。
+2、// 创建一个 HTTP 代理服务器。
+const proxy = http.createServer((req, res) => {
+  console.log('request come', req.url);
+  if (req.url === '/') {
+    const html = fs.readFileSync('test.html','utf8');
+    res.writeHead(200, { 'Content-Type': 'text/html' });
+    res.end(html);
+  }
+  if (req.url === '/script.js') {
+    res.writeHead(200, {
+       'Content-Type': 'text/javascript',
+        'Cache-Control': 'max-age=20' // 这里是设置该资源可以被浏览器缓存，缓存时间20秒
+      });
+    res.end('console.log("script loaded");');
+  }
+});
+
+proxy.listen(8888)

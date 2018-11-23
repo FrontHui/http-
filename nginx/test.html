@@ -1,0 +1,25 @@
+<html>
+    <head>
+        <title>http</title>
+        <body>
+            <div>   connection</div>
+            <form method="POST" id='form' action="/form" enctype="multipart/form-data">
+                <input type="text" name="name">
+                <input type="password" name="password">
+                <input type="file" name="file">
+                <input type="submit">
+            </form>
+        </body>
+    </head>
+    <script>
+        var form = document.getElementById('form');
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            var formData = new FormData(form);
+            fetch('/',{
+                method: 'POST',
+                body: formData
+            })
+        })
+    </script>
+</html>

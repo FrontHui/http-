@@ -1,0 +1,921 @@
+<html>
+    <head>
+        <title>http</title>
+        <body>
+            <div>   connection</div>
+            <div>this is content and data <span id="data"></span></div>
+            <button id="button">click me</button>
+        </body>
+    </head>
+    <script>
+        var index =0;
+        function doRequest () {
+            var data = document.getElementById('data');
+            data.innerText = '';
+            fetch('/data', {
+            headers: {
+                'X-Test-Cache': index ++
+            }
+        }).then(function(res){
+            return res.text();
+        }).then(function(text){
+            data.innerText = text;
+        });;
+        }
+      document.getElementById('button').addEventListener('click', doRequest);
+    </script>
+</html>
+
+
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>结售汇客户优惠管理</title>
+    <!-- Tell the browser to be responsive to screen width -->
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+    <link rel="stylesheet" href="../../modules/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../../../static/plugins/btdate/css/bootstrap-datetimepicker.min.css">
+    <link rel="stylesheet" href="../../../static/css/font-awesome.min.css">
+    <!-- <link rel="stylesheet" href="../../../static/css/AdminLTE.min.css"> -->
+    <!-- AdminLTE Skins. Choose a skin from the css/skins
+       folder instead of downloading all of them to reduce the load. -->
+    <link rel="stylesheet" href="../../../static/plugins/jqgrid/ui.jqgrid-bootstrap.css">
+    <link rel="stylesheet" href="../../../static/css/all-skins.min.css">
+    <link rel="stylesheet" href="../../../static/css/main.css">
+    <link rel="stylesheet" href="../../../static/css/preferentialManagement.css">
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+</head>
+<!-- 测试提交 -->
+<!-- ADD THE CLASS layout-boxed TO GET A BOXED LAYOUT -->
+
+<body class="hold-transition skin-blue sidebar-mini">
+    <div id="planEdit">
+        <div class="layTs-cont">
+                <form class="form-horizontal" style="width:100%">
+                        <div class="form-group">
+                            <label class="col-xs-2 control-label"><span class="text-danger">*</span>客户编号：</label>
+                            <div class="col-xs-4">
+                                    <input class="form-control input-sm " autocomplete="off" type="text" v-model="userId">
+                            </div>
+                            <label class="col-xs-2 control-label"><span class="text-danger">*</span>产品类型：</label>
+                            <div class="col-xs-4">
+                                <select class="form-control input-sm" v-model="productType" @change="selectVal(productType)">
+                                    <option value="">请选择</option>
+                                    <option value="" v-for="(item, key) in productTypeList" :value="item.value">{{item.value}}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-xs-2 control-label"><span class="text-danger">*</span>交易货币对：</label>
+                            <div class="col-xs-4">
+                                <select class="form-control input-sm" v-model="ccyId" @click="isTypeCheck(productType)">
+                                    <option value="">请选择</option>
+                                    <option value="" v-for="(item, key) in ccypair" :value="item.ccypairId">{{item.ccypairId}}</option>
+                                </select>
+                            </div>
+                            <label class="col-xs-2 control-label"><span class="text-danger">*</span>交易方向：</label>
+                            <div class="col-xs-4">
+                                <select class="form-control input-sm" v-model="tradeDriection">
+                                    <option value="">请选择</option>
+                                    <option value="" v-for="(item, key) in tradeDriectionList" :value="item.value">{{item.value}}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-xs-2 control-label"><span class="text-danger">*</span>钞汇鉴别：</label>
+                            <div class="col-xs-4">
+                                <select class="form-control input-sm" v-model="moneyJb">
+                                    <option value="">请选择</option>
+                                    <option value="" v-for="(item, key) in moneyJbList" :value="item.value">{{item.value}}</option>
+                                </select>
+                            </div>
+                            <label class="col-xs-2 control-label"><span class="text-danger">*</span>
+                                优惠点差：</label>
+                            <div class="col-xs-4">
+                                <input class="form-control input-sm " autocomplete="off" type="text" v-model="yhDiancha">
+                            </div>
+        
+                        </div>
+        
+                        <div class="form-group">
+                            <label class="col-xs-2 control-label"><span class="text-danger">*</span>
+                                优惠起点金额：</label>
+                            <div class="col-xs-4">
+                                <input class="form-control input-sm " autocomplete="off" type="text" v-model="yhMoney">
+                            </div>
+                        </div>
+                    </form>
+                    <div class="form-group text-center btn-top">
+                            <button type="button" class="btn btn-primary" @click="btnFun('确认')">
+                              <i class="fa"></i>&nbsp;确定
+                            </button>
+                            <button type="button" class="btn btn-primary" style="margin-left:20px;" @click="btnFun('取消')">
+                              <i class="fa"></i>&nbsp;取消
+                            </button>
+                    </div>
+                <!--新增修改组件-->
+                <!-- <addrecord :lists="addList" :on-cancel="cancelCb" ref = "addrecord"></addrecord> -->
+        </div> 
+    </div>
+<!-- Site wrapper -->
+
+<!-- ./wrapper -->
+<script src="../../../static/libs/jquery.min.js"></script>
+<script src="../../../static/plugins/jqgrid/grid.locale-cn.js"></script>
+<script src="../../../static/plugins/jqgrid/jquery.jqGrid.min.js"></script>
+<!--<script src="../../../static/libs/vue.min.js"></script>-->
+<script src="https://cdn.jsdelivr.net/npm/vue@2.5.17/dist/vue.js"></script>
+<script src="../../../static/libs/router.js"></script>
+<script src="../../../static/libs/bootstrap.min.js"></script>
+<script src="../../../static/plugins/btdate/js/bootstrap-datetimepicker.min.js"></script>
+<script src="../../../static/plugins/btdate/js/locales/bootstrap-datetimepicker.zh-CN.js"></script>
+<script src="../../../static/libs/app.js"></script>
+<script src="../../../static/plugins/layer/layer.js"></script>
+<script src="../../../static/js/common.js"></script>
+<script src="../../../static/js/index.js"></script>
+<!-- 独立 -->
+<script src="../../js/public/globalMethods.js"></script>
+<script src="../../conponents/AddRecord.js"></script>
+<script>
+    new Vue({
+        el:'#planEdit',
+        data:{
+            userId: '', // 用户编号
+            productType: '', // 产品类型
+            productTypeList: [{id: '01', value:'即期结售汇'}, {id: '02',value:'远期结售汇'}, {id: '03', value: '掉期结售汇'}, {id: '04', value: '择期结售汇'}],
+            ccyId: '',
+            ccypair: [],
+            tradeDriection: '', // 交易方向
+            tradeDriectionList: [{id: '01', value:'买入'}, {id: '02',value:'卖出'}],
+            moneyJb: '', // 钞汇鉴别
+            moneyJbList: [{id: '01', value:'钞'}, {id: '02',value:'汇'}], // 钞汇鉴别
+            yhDiancha: '', // 优惠点差
+            yhMoney: '', // 优惠起点金额
+            searchParam: {}, // url后面参数
+            selectInfo: {}, //  选项参数
+            reviseData: {}, // 保存要修改的对象
+            fromPage: '', // 判断是新增还是修改
+            recordId: '', // 记录id
+            addList: [ // 新增、修改菜单
+               [
+                   {id: '01', type: 'input', title: '客户编号', placeholder: '请输入客户编号', value: ''},
+                   {id: '02', type: 'button', title: '产品类型', placeholder: '请选择', options: [{id: '01', value:'即期结售汇'}, {id: '02',value:'远期结售汇'}, {id: '03', value: '掉期结售汇'}, {id: '04', value: '择期结售汇'}], value: '' },
+                ],[
+                    {id: "03", type: 'button', title: '交易货币对', placeholder: '请选择', options: [{id: '01',ccypairId: "NZD/CNY", ccypairName: "新西兰兑人民币", txFlag: "1"}], value: ''},
+                    {id: "04", type: 'button', title: '交易方向', placeholder: '请选择', options: [{id: '01', value:'买入'}, {id: '02',value:'卖出'}], value: ''}
+                ],
+                [
+                    {id: '05', type: 'button', title: '钞汇鉴别', placeholder: '请选择', options: [{id: '01', value:'钞'}, {id: '02',value:'汇'}], value: '' },
+                    {id: "06", type: 'input', title: '优惠点差', placeholder: '请输入优惠点差', value: ''}
+                ],
+                [
+                    {id: "07", type: 'input', title: '优惠起点金额', placeholder: '请输入优惠起点金额',  value: ''}
+                ]
+            ],
+            tipText: ['请输入客户编号', '请选择产品类型', '请选择交易货币对', '请选择交易方向', '请选择钞汇鉴别', '请输入优惠点差', '请输入优惠起点金额']
+        },
+        created:function(){
+            this.fromPage = window.sessionStorage.getItem('fromPage') || '';
+            this.recordId = window.sessionStorage.getItem('recordId') || '';
+            if (this.fromPage && this.fromPage === 'revise') {
+                this.reviseData = JSON.parse(window.sessionStorage.getItem('reviseData'));
+                this.userId = this.reviseData[0].cstId; // 客户编号
+                this.ccyId = this.reviseData[0].ccypairId; // 货币对
+                this.productType = this.reviseData[0].pdType === '01' ? '即期结售汇' : (this.reviseData[0].pdType === '02' ? '远期结售汇' : (this.reviseData[0].pdType === '03' ? '掉期结售汇' : (this.reviseData[0].pdType === '04' ? '择期结售汇' : ''))) , // 产品类型 01-即期结售汇、02-远期结售汇、03-掉期结售汇、04-择期结售汇 // 产品类型
+                this.tradeDriection = this.reviseData[0].txnDr === '1' ? '买入' : (this.reviseData[0].txnDr === '2' ? '卖出' : '' ); // 交易方向
+                this.moneyJb = this.reviseData[0].bnIdt === '1' ? '钞' : (this.reviseData[0].bnIdt === '2' ? '汇' : '' ); // 钞汇鉴别
+                this.yhDiancha = this.reviseData[0].preDiff; // 优惠点差
+                this.yhMoney = this.reviseData[0].prftAmt; // 优惠起点金额
+                this.pageInit(this.reviseData[0].pdType, true); // 获取货币对数据
+                window.sessionStorage.removeItem('fromPage');
+                window.sessionStorage.removeItem('recordId');
+                window.sessionStorage.removeItem('reviseData');
+            }
+        },
+        methods:{
+            pageInit (pdType, revise) {
+                let self = this;
+                ajaxQuestSearch({
+                    txCode: 'COM02004',
+                    txHead: 'comm',
+                    type: 'post',
+                    pageIdx: '1', //当前页
+                    pageSize: '0', //每页多少条
+                    data: {
+                        ccypairId:'',
+                        pdType: pdType || '',
+                        ccypairName: '',
+                        txFlag: ''
+                    },
+                    successCallBack: function (data) {
+                        self.ccypair = [];
+                        if (data && data.response.rowCount > 100) {
+                            for (let i = 0; i< data.response.list.length; i++) {
+                                self.ccypair = self.ccypair.concat(data.response.list[i]);
+                            }
+                        } else {
+                            self.ccypair = data.response.list;
+                        }
+                        // data && data.response&& (self.ccyData = data.response.list);
+                        if (revise) {
+                            let _obj = {id: "03", type: 'button', title: '交易货币对', placeholder: '请选择', options: self.ccyData, value: self.reviseData[0] && self.reviseData[0].ccypairId || ''};
+                            Vue.set(self.ccypair, 0, _obj);
+                        }
+                    },
+                    cancelCallBack: function () {}
+                });
+            },
+            selectVal (pdType) {
+                let _prdType = pdType === '即期结售汇' ? '01' : (pdType === '远期结售汇' ? '02' : (pdType === '掉期结售汇' ? '03' : (pdType === '择期结售汇' ? '04' : '')))
+                if (_prdType) {
+                    this.pageInit(_prdType);
+                }
+            },
+            isTypeCheck (data) {
+                if (!data) {
+                    window.alert('请先选择产品类型');
+                    return false;
+                }
+            },
+            btnFun (e) {
+                if (e === '确认') {
+                    this.addRecord();
+                } else if (e === '取消') {
+                    window.history.back();
+                }
+            },
+            // 新增
+            addRecord () {
+                let self = this;
+                if(self.paramCheck()) {
+                    ajaxQuestSearch({
+                        txCode: this.fromPage === 'add'? 'COM04009' : (this.fromPage === 'revise' ? 'COM04010' : 'COM04009'),
+                        txHead: 'comm',
+                        type: 'post',
+                        data: {
+                            id: this.recordId,
+                            cstId: this.userId, // 客户编号
+                            ccypairId: this.ccyId, // 交易货币对
+                            pdType: this.productType === '即期结售汇' ? '01' : (this.productType === '远期结售汇' ? '02' : (this.productType === '掉期结售汇' ? '03' : (this.productType === '择期结售汇' ? '04' : ''))) , // 产品类型 01-即期结售汇、02-远期结售汇、03-掉期结售汇、04-择期结售汇
+                            txnDr: this.tradeDriection === '买入' ? '1' : (this.tradeDriection === '卖出' ? '2' : '' ), // 交易方向
+                            bnIdt: this.moneyJb === '钞' ? '1' : (this.moneyJb === '汇' ? '2' : '' ), // 钞汇鉴别
+                            preDiff: this.yhDiancha, // 优惠点差
+                            prftAmt: this.yhMoney // 优惠起点金额
+                        },
+                        successCallBack: function (data) {
+                            if (data.err_code === '000000') {
+                                window.sessionStorage.removeItem('fromPage');
+                                window.sessionStorage.removeItem('recordId');
+                                window.sessionStorage.removeItem('reviseData');
+                                window.confirm(self.fromPage === 'add' ? '新增成功' : (self.fromPage === 'revise' ? '修改成功' : '操作成功') , function () {
+                                    window.history.back();
+                                    //删除弹窗
+                                    parent.layer.closeAll('dialog');
+                                });
+                            } else {
+                                alert(data.err_msg || '系统错误');
+                            }
+                        },
+                        cancelCallBack: function () {}
+                    });
+                };
+            },
+            cancelCb () {
+                window.history.back();
+            },
+            paramCheck () {
+                var re = /^\d+(?=\.{0,1}\d{0,6}$|$)/;
+                let _arr = [
+                    {key: this.userId},
+                    {key: this.productType},
+                    {key: this.ccyId},
+                    {key: this.tradeDriection},
+                    {key: this.moneyJb},
+                    {key: this.yhDiancha},
+                    {key: this.yhMoney}
+                ];
+                for (var j = 0; j< _arr.length; j++) {
+                    if (!_arr[j].key) {
+                        window.alert(this.tipText[j] || '参数错误');
+                        return false;
+                    } else {
+                        if (_arr[5] && !re.test(_arr[5].key)) {
+                            window.alert('优惠点差只能输入整数、小数(6位)');
+                            return false;
+                        } else if (_arr[6] && !re.test(_arr[6].key)) {
+                            window.alert('优惠起点金额只能输入整数、小数(6位)');
+                            return false;
+                        }
+                    }
+                }
+                return true;
+            }
+        },
+        destroyed () {
+            window.sessionStorage.removeItem('fromPage');
+            window.sessionStorage.removeItem('recordId');
+            window.sessionStorage.removeItem('reviseData');
+        }
+    })
+</script>
+</body>
+
+</html>
+
+
+
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>结售汇牌价管理</title>
+    <!-- Tell the browser to be responsive to screen width -->
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+    <link rel="stylesheet" href="../../modules/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../../../static/plugins/btdate/css/bootstrap-datetimepicker.min.css">
+    <link rel="stylesheet" href="../../../static/css/font-awesome.min.css">
+    <!-- <link rel="stylesheet" href="../../../static/css/AdminLTE.min.css"> -->
+    <!-- AdminLTE Skins. Choose a skin from the css/skins
+       folder instead of downloading all of them to reduce the load. -->
+    <link rel="stylesheet" href="../../../static/plugins/jqgrid/ui.jqgrid-bootstrap.css">
+    <link rel="stylesheet" href="../../../static/css/all-skins.min.css">
+    <link rel="stylesheet" href="../../../static/css/main.css">
+    <link rel="stylesheet" href="../../../static/css/preferentialManagement.css">
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+</head>
+<!-- 测试提交 -->
+<!-- ADD THE CLASS layout-boxed TO GET A BOXED LAYOUT -->
+
+<body class="hold-transition skin-blue sidebar-mini">
+    <div id="planEdit">
+        <div class="layTs-cont">
+            <!--新增修改组件-->
+            <!--<addrecord :lists="addList" :is-paijia="isPaijia" :on-cancel="cancelCb" v-on:prdtype="prdTypeBack" ref = "addrecord"></addrecord>-->
+        <!--</div> -->
+            <form class="form-horizontal" style="width:100%">
+                <div class="form-group">
+                    <label class="col-xs-2 control-label"><span class="text-danger">*</span>产品类型：</label>
+                    <div class="col-xs-4">
+                        <select class="form-control input-sm" v-model="productId" @change="selectVal(productId)">
+                            <option value="">请选择</option>
+                            <option value="" v-for="(item, key) in productType" :value="item.id">{{item.value}}</option>
+                        </select>
+                    </div>
+                    <label class="col-xs-2 control-label"><span class="text-danger">*</span>交易货币对：</label>
+                    <div class="col-xs-4">
+                        <select class="form-control input-sm" v-model="ccyId" @click="isTypeCheck(productId)">
+                            <option value="">请选择</option>
+                            <option value="" v-for="(item, key) in ccypair" :value="item.ccypairId">{{item.ccypairId}}</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-2 control-label"><span class="text-danger">*</span>交易期限：</label>
+                    <div class="col-xs-4">
+                        <select class="form-control input-sm" v-model="tradeId" @click="isTypeCheck(productId)">
+                            <option value="">请选择</option>
+                            <option value="" v-for="(item, key) in tradeDate" :value="item.txLmtCd">{{item.txLmtNm}}</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group" v-if="productId !== '03'">
+                    <label class="col-xs-2 control-label"><span class="text-danger">*</span>
+                        成本买入价格：</label>
+                    <div class="col-xs-4">
+                        <input class="form-control input-sm " autocomplete="off" type="text" v-model="costBuyPrice" @blur="calc">
+                    </div>
+                    <label class="col-xs-2 control-label"><span class="text-danger">*</span>
+                        成本卖出价格：</label>
+                    <div class="col-xs-4">
+                        <input class="form-control input-sm " autocomplete="off" type="text" v-model="costSellPrice" @blur="calc">
+                    </div>
+
+                </div>
+                <div class="form-group" v-if="productId === '03'">
+                    <label class="col-xs-2 control-label"><span class="text-danger">*</span>
+                        近端成本买入价格：</label>
+                    <div class="col-xs-4">
+                        <input class="form-control input-sm " autocomplete="off" type="text" v-model="nearCostBuyPrice" @blur="calc">
+                    </div>
+                    <label class="col-xs-2 control-label"><span class="text-danger">*</span>
+                        近端成本卖出价格：</label>
+                    <div class="col-xs-4">
+                        <input class="form-control input-sm " autocomplete="off" type="text" v-model="nearCostSellPrice" @blur="calc">
+                    </div>
+
+                </div>
+
+                <div class="form-group">
+                    <label class="col-xs-2 control-label"><span class="text-danger">*</span>
+                        牌价点差：</label>
+                    <div class="col-xs-4">
+                        <input class="form-control input-sm " autocomplete="off" type="text" v-model="paiJiaCha" @blur="calc">
+                    </div>
+                    <template v-if="productId && productId !== '01'">
+                        <label class="col-xs-2 control-label"><span class="text-danger">*</span>
+                            {{productId === '02' ? '远' : '掉'}}期点：</label>
+                        <div class="col-xs-4">
+                            <input class="form-control input-sm " autocomplete="off" type="text" v-model="qiDian" @blur="calc">
+                        </div>
+                    </template>
+                </div>
+
+                <div class="form-group" v-if="productId !== '03'">
+                    <label class="col-xs-2 control-label"><span class="text-danger">*</span>
+                        买入牌价：</label>
+                    <div class="col-xs-4">
+                        <input class="form-control input-sm " autocomplete="off" type="text" v-model="buyPaijia" disabled="disabled">
+                    </div>
+                    <label class="col-xs-2 control-label"><span class="text-danger">*</span>
+                        卖出牌价：</label>
+                    <div class="col-xs-4">
+                        <input class="form-control input-sm " autocomplete="off" type="text" v-model="sellPaijia" disabled="disabled">
+                    </div>
+                </div>
+
+                <template v-if="productId === '03'">
+                    <div class="form-group">
+                        <label class="col-xs-2 control-label"><span class="text-danger">*</span>
+                            近端买入牌价：</label>
+                        <div class="col-xs-4">
+                            <input class="form-control input-sm " autocomplete="off" type="text" v-model="nearBuyPaijia" disabled="disabled">
+                        </div>
+                        <label class="col-xs-2 control-label"><span class="text-danger">*</span>
+                            近端卖出牌价：</label>
+                        <div class="col-xs-4">
+                            <input class="form-control input-sm " autocomplete="off" type="text" v-model="nearSellPaijia" disabled="disabled">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-xs-2 control-label"><span class="text-danger">*</span>
+                            远端成本买入价格：</label>
+                        <div class="col-xs-4">
+                            <input class="form-control input-sm " autocomplete="off" type="text" v-model="farCostBuyPrice" disabled="disabled">
+                        </div>
+                        <label class="col-xs-2 control-label"><span class="text-danger">*</span>
+                            远端成本卖出价格：</label>
+                        <div class="col-xs-4">
+                            <input class="form-control input-sm " autocomplete="off" type="text" v-model="farCostSellPrice" disabled="disabled">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-xs-2 control-label"><span class="text-danger">*</span>
+                            远端买入牌价：</label>
+                        <div class="col-xs-4">
+                            <input class="form-control input-sm " autocomplete="off" type="text" v-model="farBuyPaijia" disabled="disabled">
+                        </div>
+                        <label class="col-xs-2 control-label"><span class="text-danger">*</span>
+                            远端卖出牌价：</label>
+                        <div class="col-xs-4">
+                            <input class="form-control input-sm " autocomplete="off" type="text" v-model="farSellPaijia" disabled="disabled">
+                        </div>
+                    </div>
+                </template>
+            </form>
+            <div class="text-center btn-top">
+                <button type="button" class="btn btn-primary" @click="confirm">确定</button>
+                <button style="margin-left:20px;" type="button" class="btn btn-primary" id="remForm" @click= "cancel">取消</button>
+                <!-- <button style="margin-left:20px;" type="button" class="btn btn-primary" @click="reset">修改</button> -->
+            </div>
+        </div>
+    </div>
+<!-- Site wrapper -->
+
+<!-- ./wrapper -->
+<script src="../../../static/libs/jquery.min.js"></script>
+<script src="../../../static/plugins/jqgrid/grid.locale-cn.js"></script>
+<script src="../../../static/plugins/jqgrid/jquery.jqGrid.min.js"></script>
+<!--<script src="../../../static/libs/vue.min.js"></script>-->
+<script src="https://cdn.jsdelivr.net/npm/vue@2.5.17/dist/vue.js"></script>
+<script src="../../../static/libs/router.js"></script>
+<script src="../../../static/libs/bootstrap.min.js"></script>
+<script src="../../../static/plugins/btdate/js/bootstrap-datetimepicker.min.js"></script>
+<script src="../../../static/plugins/btdate/js/locales/bootstrap-datetimepicker.zh-CN.js"></script>
+<script src="../../../static/libs/app.js"></script>
+<script src="../../../static/plugins/layer/layer.js"></script>
+<script src="../../../static/js/common.js"></script>
+<script src="../../../static/js/index.js"></script>
+<!-- 独立 -->
+<script src="../../js/public/globalMethods.js"></script>
+<script src="../../conponents/AddRecord.js"></script>
+<script>
+    new Vue({
+        el:'#planEdit',
+        data:{
+            ccyId: '',
+            ccypair: [], // 货币对
+            productId: '',
+            productType: [
+                {id: '01', value:'即期结售汇'}, {id: '02',value:'远期结售汇'}, {id: '03', value: '掉期结售汇'}
+            ],
+            tradeId: '',
+            tradeDate: [], // 交易期限
+            costBuyPrice: '',
+            costSellPrice: '',
+            nearCostBuyPrice: '',
+            nearCostSellPrice: '',
+            paiJiaCha: '',
+            qiDian: '',
+            buyPaijia: '',
+            sellPaijia: '',
+            nearBuyPaijia: '',
+            nearSellPaijia: '',
+            farCostBuyPrice: '',
+            farCostSellPrice: '',
+            farBuyPaijia: '',
+            farSellPaijia: '',
+            requestData: {}
+        },
+        methods:{
+            pageInit (pdType) {
+                let self = this;
+                ajaxQuestSearch({
+                    txCode: 'COM02004',
+                    txHead: 'comm',
+                    type: 'post',
+                    pageIdx: '1', //当前页
+                    pageSize: '0', //每页多少条
+                    data: {
+                        ccypairId:'',
+                        pdType: pdType,
+                        ccypairName: '',
+                        txFlag: ''
+                    },
+                    successCallBack: function (data) {
+                        self.ccypair = [];
+                        if (data && data.response.rowCount > 100) {
+                            for (let i = 0; i< data.response.list.length; i++) {
+                                self.ccypair = self.ccypair.concat(data.response.list[i]);
+                            }
+                        } else {
+                            self.ccypair = data.response.list;
+                        }
+                    },
+                    cancelCallBack: function () {}
+                });
+            },
+            selectVal (pdType) {
+                console.log('产品类型变化'+ pdType);
+                if (pdType) {
+                    this.pageInit(pdType);
+                }
+            },
+            isTypeCheck (data) {
+                if (!data) {
+                    window.alert('请先选择产品类型');
+                    return false;
+                }
+            },
+            // 新增记录
+            addRecord (data) {
+                let self = this;
+                if (!data) {
+                    window.confirm('参数获取失败', function () {
+                        window.history.back();
+                         //删除弹窗
+                         parent.layer.closeAll('dialog');
+                    })
+                } else {
+                    ajaxQuestSearch({ // 没有修改
+                        txCode: 'COM04002',
+                        txHead: 'comm',
+                        type: 'post',
+                        data: data,
+                        successCallBack: function (data) {
+                            if (data.err_code === '000000') {
+                                window.sessionStorage.removeItem('fromPage');
+                                window.sessionStorage.removeItem('recordId');
+                                window.sessionStorage.removeItem('reviseData');
+                                window.confirm('新增成功', function () {
+                                    window.history.back();
+                                    //删除弹窗
+                                    parent.layer.closeAll('dialog');
+                                });
+                            } else {
+                                window.alert(data.err_msg || '系统错误');
+                            }
+                        },
+                        cancelCallBack: function () {
+                        }
+                    });
+                }
+            },
+            queryTradeDate (data, cb) {
+                let self = this;
+                ajaxQuestSearch({
+                    txCode: 'COM02019',
+                    txHead: 'comm',
+                    type: 'post',
+                    pageIdx: '0', //当前页
+                    pageSize: '0', //每页多少条
+                    data: {
+                        pdType: data || ''
+                    },
+                    successCallBack: function (data) {
+                        data && data.response && (self.tradeDate = data.response.list);
+                        cb && typeof cb === 'function' && cb()
+                    },
+                    cancelCallBack: function () {}
+                });
+            },
+            reset () {
+                    this.ccyId = '';
+                    this.productId = '';
+                    this.tradeId = '';
+                    this.costBuyPrice = '';
+                    this.costSellPrice = '';
+                    this.nearCostBuyPrice = '';
+                    this.nearCostSellPrice = '';
+                    this.paiJiaCha = '';
+                    this.qiDian = '';
+                    this.buyPaijia = '';
+                    this.sellPaijia = '';
+                    this.nearBuyPaijia = '';
+                    this.nearSellPaijia = '';
+                    this.farCostBuyPrice = '';
+                    this.farCostSellPrice = '';
+                    this.farBuyPaijia = '';
+                    this.farSellPaijia = '';
+            },
+            calc () {
+                // this.paramCheck();
+                if (this.productId === '01' || this.productId === '02') {
+                    if (this.costBuyPrice && this.costSellPrice && this.paiJiaCha) {
+                        if (this.productId === '02') {
+                            if (this.qiDian) {
+                                this.buyPaijia = (Number(this.costBuyPrice) - Number(this.paiJiaCha) + Number(this.qiDian)).toFixed(6) + '';
+                                this.sellPaijia = (Number(this.costSellPrice) + Number(this.paiJiaCha) + Number(this.qiDian)).toFixed(6) + '';
+                            } else {
+                                return;
+                            }
+                        } else {
+                            this.buyPaijia = (Number(this.costBuyPrice) - Number(this.paiJiaCha)).toFixed(6) + '';
+                            this.sellPaijia = (Number(this.costSellPrice) + Number(this.paiJiaCha)).toFixed(6) + '';
+                        }
+                    } else {
+                        return;
+                    }
+                } else if (this.productId === '03') {
+                    this.nearBuyPaijia = this.nearCostBuyPrice;
+                    this.nearSellPaijia = this.nearCostSellPrice;
+                    if (this.qiDian) {
+                        this.farCostBuyPrice = (Number(this.nearCostBuyPrice) + Number(this.qiDian)).toFixed(6);
+                        this.farCostSellPrice = (Number(this.nearCostSellPrice) + Number(this.qiDian)).toFixed(6);
+                    }
+                    if (this.qiDian && this.paiJiaCha) {
+                        this.farBuyPaijia = (Number(this.nearCostBuyPrice) + Number(this.qiDian) - Number(this.paiJiaCha)).toFixed(6) + '';
+                        this.farSellPaijia = (Number(this.nearCostSellPrice) + Number(this.qiDian)  + Number(this.paiJiaCha)).toFixed(6) + '';
+                    } else {
+                        return;
+                    }
+                }
+            },
+            confirm () {
+                this.requestData = {};
+                if(this.paramCheck()) {
+                   if (this.productId === '01') {
+                       this.requestData = {
+                           ccypairId: this.ccyId || '',
+                           pdType: this.productId || '',
+                           txLmtCd: this.tradeId || '',
+                           buyPrice: this.buyPaijia || '',
+                           sellPrice: this.sellPaijia || '',
+                           diff: this.paiJiaCha || '',
+                           costBuyPrice: this.costBuyPrice || '',
+                           costSellPrice: this.costSellPrice || '',
+                           vldFlag: '1'
+                       }
+                   } else if (this.productId === '02') {
+                       this.requestData = {
+                           ccypairId: this.ccyId || '',
+                           pdType: this.productId || '',
+                           txLmtCd: this.tradeId || '',
+                           buyPrice: this.buyPaijia || '',
+                           sellPrice: this.sellPaijia || '',
+                           diff: this.paiJiaCha || '',
+                           fsDiff: this.qiDian || '',
+                           costBuyPrice: this.costBuyPrice || '',
+                           costSellPrice: this.costSellPrice || '',
+                           vldFlag: '1'
+                       }
+                   } else if (this.productId === '03') {
+                       this.requestData = {
+                           ccypairId: this.ccyId || '',
+                           pdType: this.productId || '',
+                           txLmtCd: this.tradeId || '',
+                           costBuyPrice: this.nearCostBuyPrice || '',
+                           costSellPrice: this.nearCostSellPrice || '',
+                           diff: this.paiJiaCha || '',
+                           fsDiff: this.qiDian || '',
+                           buyPrice: this.nearBuyPaijia || '',
+                           sellPrice: this.nearSellPaijia || '',
+                           fCostBuyPrice: this.farCostBuyPrice || '',
+                           fCostSellPrice: this.farCostSellPrice,
+                           fBuyPrice: this.farBuyPaijia,
+                           fSellPrice: this.farSellPaijia,
+                           vldFlag: '1'
+                       }
+                   }
+                } else {
+                    return false;
+                };
+                this.addRecord(this.requestData);
+            },
+            cancel () {
+                window.history.back();
+            },
+            paramCheck () {
+                var re = /^\d+(?=\.{0,1}\d{0,6}$|$)/;
+                switch (this.productId) {
+                    case '01':
+                        if (!this.ccyId) {
+                            window.alert('交易货币对不能为空');
+                            return false;
+                        } else if (!this.productId) {
+                            window.alert('产品类型不能为空');
+                            return false;
+                        } else if (!this.tradeId) {
+                            window.alert('交易期限不能为空');
+                            return false;
+                        } else if (!this.costBuyPrice) {
+                            window.alert('成本买入价格不能为空');
+                            return false;
+                        } else if (!this.costSellPrice) {
+                            window.alert('成本卖出价格不能为空');
+                            return false;
+                        } else if (!this.paiJiaCha) {
+                            window.alert('牌价点差不能为空');
+                            return false;
+                        } else if (!this.buyPaijia) {
+                            window.alert('买入牌价不能为空');
+                            return false;
+                        } else if (!this.sellPaijia) {
+                            window.alert('卖出牌价不能为空');
+                            return false;
+                        } else {
+                            if (this.costBuyPrice && !re.test(this.costBuyPrice)) {
+                                window.alert('成本买入价格只能输入整数、小数(6位)');
+                                return false;
+                            } else if (this.costSellPrice && !re.test(this.costSellPrice)) {
+                                window.alert('成本卖出价格只能输入整数、小数(6位)');
+                                return false;
+                            } else if (this.paiJiaCha && !re.test(this.paiJiaCha)) {
+                                window.alert('牌价点差只能输入整数、小数(6位)');
+                                return false;
+                            }
+                        }
+                        break;
+                    case  '02':
+                        if (!this.ccyId) {
+                            window.alert('交易货币对不能为空');
+                            return false;
+                        } else if (!this.productId) {
+                            window.alert('产品类型不能为空');
+                            return false;
+                        } else if (!this.tradeId) {
+                            window.alert('交易期限不能为空');
+                            return false;
+                        } else if (!this.costBuyPrice) {
+                            window.alert('成本买入价格不能为空');
+                            return false;
+                        } else if (!this.costSellPrice) {
+                            window.alert('成本卖出价格不能为空');
+                            return false;
+                        } else if (!this.paiJiaCha) {
+                            window.alert('牌价点差不能为空');
+                            return false;
+                        } else if (!this.buyPaijia) {
+                            window.alert('买入牌价不能为空');
+                            return false;
+                        } else if (!this.sellPaijia) {
+                            window.alert('卖出牌价不能为空');
+                            return false;
+                        } else if (!this.qiDian) {
+                            window.alert('远期点不能为空');
+                            return false;
+                        } else {
+                            if (this.costBuyPrice && !re.test(this.costBuyPrice)) {
+                                window.alert('成本买入价格只能输入整数、小数(6位)');
+                                return false;
+                            } else if (this.costSellPrice && !re.test(this.costSellPrice)) {
+                                window.alert('成本卖出价格只能输入整数、小数(6位)');
+                                return false;
+                            } else if (this.paiJiaCha && !re.test(this.paiJiaCha)) {
+                                window.alert('牌价点差只能输入整数、小数(6位)');
+                                return false;
+                            } else if (this.qiDian && !re.test(this.qiDian)) {
+                                window.alert('远期点只能输入整数、小数(6位)');
+                                return false;
+                            }
+                        }
+                        break;
+                    case '03':
+                        if (!this.ccyId) {
+                            window.alert('交易货币对不能为空');
+                            return false;
+                        } else if (!this.productId) {
+                            window.alert('产品类型不能为空');
+                            return false;
+                        } else if (!this.tradeId) {
+                            window.alert('交易期限不能为空');
+                            return false;
+                        } else if (!this.nearCostBuyPrice) {
+                            window.alert('近端成本买入价格不能为空');
+                            return false;
+                        } else if (!this.nearCostSellPrice) {
+                            window.alert('近端成本卖出价格不能为空');
+                            return false;
+                        } else if (!this.paiJiaCha) {
+                            window.alert('牌价点差不能为空');
+                            return false;
+                        } else if (!this.qiDian) {
+                            window.alert('掉期点不能为空');
+                            return false;
+                        } else if (!this.nearBuyPaijia) {
+                            window.alert('近端买入牌价不能为空');
+                            return false;
+                        } else if (!this.nearSellPaijia) {
+                            window.alert('近端卖出牌价不能为空');
+                            return false;
+                        } else if (!this.farCostBuyPrice) {
+                            window.alert('远端成本买入价格不能为空');
+                            return false;
+                        } else if (!this.farCostSellPrice) {
+                            window.alert('远端成本卖出价格不能为空');
+                            return false;
+                        } else if (!this.farBuyPaijia) {
+                            window.alert('远端买入牌价不能为空');
+                            return false;
+                        } else if (!this.farSellPaijia) {
+                            window.alert('远端卖出牌价不能为空');
+                            return false;
+                        } else {
+                            if (this.nearCostBuyPrice && !re.test(this.nearCostBuyPrice)) {
+                                window.alert('近端成本买入价格只能输入整数、小数(6位)');
+                                return false;
+                            } else if (this.nearCostSellPrice && !re.test(this.nearCostSellPrice)) {
+                                window.alert('近端成本卖出价格只能输入整数、小数(6位)');
+                                return false;
+                            } else if (this.paiJiaCha && !re.test(this.paiJiaCha)) {
+                                window.alert('牌价点差只能输入整数、小数(6位)');
+                                return false;
+                            } else if (this.qiDian && !re.test(this.qiDian)) {
+                                window.alert('掉期点只能输入整数、小数(6位)');
+                                return false;
+                            } else if (this.nearBuyPaijia && !re.test(this.nearBuyPaijia)) {
+                                window.alert('近端买入牌价只能输入整数、小数(6位)');
+                                return false;
+                            } else if (this.nearSellPaijia && !re.test(this.nearSellPaijia)) {
+                                window.alert('近端卖出牌价只能输入整数、小数(6位)');
+                                return false;
+                            } else if (this.farCostBuyPrice && !re.test(this.farCostBuyPrice)) {
+                                window.alert('远端成本买入价格只能输入整数、小数(6位)');
+                                return false;
+                            } else if (this.farCostSellPrice && !re.test(this.farCostSellPrice)) {
+                                window.alert('远端成本卖出价格只能输入整数、小数(6位)');
+                                return false;
+                            }  else if (this.farBuyPaijia && !re.test(this.farBuyPaijia)) {
+                                window.alert('远端买入牌价只能输入整数、小数(6位)');
+                                return false;
+                            } else if (this.farSellPaijia && !re.test(this.farSellPaijia)) {
+                                window.alert('远端卖出牌价只能输入整数、小数(6位)');
+                                return false;
+                            }
+                        }
+                        break;
+                    default:
+                        break
+                }
+                return true;
+            }
+        },
+        watch: {
+            productId (nVal, oldVal) {
+                let self = this;
+                if (nVal !== oldVal) {
+                    self.queryTradeDate(nVal, self.calc);
+                } else {
+                    return;
+                }
+            }
+        }
+    })
+</script>
+</body>
+
+</html>
